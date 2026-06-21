@@ -1,0 +1,150 @@
+.classic-gojek-header {
+  ion-toolbar {
+    --background: #ffffff;
+    --border-color: #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  .cancel-txt {
+    --padding-start: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    text-transform: none;
+  }
+  .header-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    color: #111111;
+  }
+}
+
+.classic-content {
+  --background: #ffffff;
+}
+
+.gojek-review-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 40px;
+
+  .main-prompt {
+    font-family: 'Impact', 'Arial Black', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+    color: #111111;
+    margin-bottom: 25px;
+    text-align: center;
+  }
+}
+
+.driver-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+
+  .avatar-frame {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid #555555;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .driver-name {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: #222222;
+    margin-top: 15px;
+    letter-spacing: 0.5px;
+  }
+}
+
+// Bintang Hijau Khas Gojek Lama
+.gojek-stars {
+  margin-bottom: 10px;
+  
+  ion-icon {
+    font-size: 2.5rem;
+    color: #30b036; // Hijau Gojek
+    margin: 0 4px;
+    cursor: pointer;
+  }
+}
+
+.hint-text {
+  font-size: 0.9rem;
+  color: #888888;
+  margin-bottom: 25px;
+}
+
+// Kolom Input Klasik Garis Bawah
+.gojek-comment-field {
+  display: flex;
+  align-items: center;
+  width: 90%;
+  border-bottom: 1px solid #cccccc;
+  padding-bottom: 5px;
+  margin-bottom: 40px;
+
+  .mail-icon {
+    font-size: 1.4rem;
+    color: #30b036;
+    margin-right: 10px;
+  }
+
+  input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 1rem;
+    color: #333333;
+
+    &::placeholder {
+      color: #999999;
+      font-style: italic;
+    }
+  }
+}
+
+// Tombol Bulat SEND di bawah
+.send-btn-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.gojek-circular-btn {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background-color: #30b036;
+  color: #ffffff;
+  border: none;
+  font-family: 'Arial Black', sans-serif;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 10px rgba(48, 176, 54, 0.3);
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.1s ease;
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &:disabled {
+    background-color: #a2dda5;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+}

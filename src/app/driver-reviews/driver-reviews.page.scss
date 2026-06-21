@@ -1,0 +1,63 @@
+.summary-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+  
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: #666;
+  }
+  h1 {
+    margin: 10px 0 5px 0;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #111;
+  }
+  p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #999;
+  }
+}
+
+.review-item-card {
+  background: #ffffff;
+  margin: 0 0 12px 0;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+
+  .card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    
+    .order-code {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #777;
+    }
+    .stars-indicator {
+      ion-icon {
+        font-size: 1rem;
+        margin-left: 1px;
+      }
+    }
+  }
+
+  .customer-comment {
+    font-size: 0.95rem;
+    color: #333333;
+    font-style: italic;
+    margin: 8px 0;
+    line-height: 1.4;
+  }
+
+  .time-stamp {
+    font-size: 0.75rem;
+    color: #bbbbbb;
+    text-align: right;
+  }
+}

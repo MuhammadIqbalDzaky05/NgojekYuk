@@ -1,0 +1,117 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * File ini mengelola gaya CSS yang berlaku secara global untuk seluruh aplikasi.
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/**
+ * Ionic Dark Mode
+ */
+@import "@ionic/angular/css/palettes/dark.system.css";
+
+/* ============================================================================
+ * LIBRARY CSS (PETA/LEAFLET)
+ * ============================================================================ */
+@import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
+
+/* ============================================================================
+ * CUSTOM GLOBAL STYLES (NAVIGASI TAB & SAGE THEME)
+ * ============================================================================ */
+
+:root {
+  /* Sage & Cream Palette */
+  --ion-color-primary: #8A9A5B;           
+  --ion-color-primary-rgb: 138, 154, 91;
+  --ion-color-primary-contrast: #ffffff;
+
+  --app-cream-bg: #FFFDD0;                
+  --app-cream-soft: #FAF9F6;
+  
+  --ion-background-color: var(--app-cream-soft);
+}
+
+ion-tab-button.active-tab {
+  --color-selected: var(--ion-color-primary) !important;
+  font-weight: bold;
+
+  ion-icon {
+    transform: scale(1.12);
+    transition: transform 0.2s ease-in-out;
+  }
+}
+
+/* ============================================================================
+ * ALL-DEVICE FIT & SAFE AREA HANDLING (ANTI-PONI & NAVBAR HP)
+ * ============================================================================ */
+
+body {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+ion-tab-bar {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+// Menjaga konten header tidak menusuk masuk ke area status bar / notch atas HP
+ion-header {
+  padding-top: env(safe-area-inset-top);
+}
+
+// PENGGABUNGAN BARU: Memaksa isi halaman melipir aman dari layout hardware HP
+ion-content {
+  --padding-top: env(safe-area-inset-top);
+  --padding-bottom: env(safe-area-inset-bottom);
+  --padding-start: env(safe-area-inset-left);
+  --padding-end: env(safe-area-inset-right);
+}
+
+
+/* ============================================================================
+ * FIX GLOBAL DARK MODE (OTOMATIS)
+ * ============================================================================ */
+
+@media (prefers-color-scheme: dark) {
+  /* * Gunakan variabel CSS Ionic untuk hasil terbaik. 
+   * Ini memastikan semua komponen Ionic yang menggunakan variabel 
+   * berubah warna secara seragam.
+   */
+  :root {
+    --ion-text-color: #f4f4f4;
+    --ion-background-color: #121212;
+    --ion-item-background: #1e1e1e;
+    --ion-color-primary: #a3b18a; /* Sage yang lebih lembut untuk dark mode */
+  }
+  
+  /* Styling untuk Form/Input agar terlihat kontras di Dark Mode */
+  input, textarea, select {
+    color: var(--ion-text-color) !important;
+    background-color: var(--ion-item-background) !important;
+    border: 1px solid #333333 !important;
+  }
+
+  /* Memastikan latar belakang konten aplikasi gelap */
+  ion-content {
+    --background: var(--ion-background-color); // Akan otomatis mengikuti #121212
+  }
+
+  /* Class tambahan untuk elemen khusus yang masih membutuhkan penyesuaian */
+  .dark-mode-text {
+    color: #ffffff !important;
+  }
+}

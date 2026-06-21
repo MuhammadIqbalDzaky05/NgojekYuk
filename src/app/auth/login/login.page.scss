@@ -1,0 +1,119 @@
+.auth-wrapper {
+  background: linear-gradient(135deg, var(--ion-color-primary) 0%, #1dd1a1 100%);
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.header-section {
+  flex: 1.5; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  padding: 5vh 20px; // MENGGUNAKAN vh: Padding vertikal mengikuti tinggi layar HP
+
+  .logo-container {
+    background: rgba(255, 255, 255, 0.2); 
+    padding: 20px;
+    border-radius: 50%;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .app-logo {
+    // PERBAIKAN: Otomatis mengecil di HP mini, maksimal tetap 200px di layar besar
+    width: 45vw; 
+    max-width: 200px;
+    height: auto;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.2));
+  }
+
+  .app-name {
+    font-weight: bold;
+    font-size: 2.2rem; // Sedikit disesuaikan agar tidak over-size di HP kecil
+    margin: 5px 0 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .app-tagline {
+    opacity: 0.9;
+    font-size: 1rem;
+    margin-top: 5px;
+    text-align: center;
+  }
+}
+
+.form-section {
+  flex: 2;
+  background: white;
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+  position: relative;
+  
+  .login-card {
+    // PERBAIKAN: Menggunakan persentase/rem agar tarikan card menimpa background lebih luwes
+    margin-top: -3.5rem; 
+    background: #fff;
+    border-radius: 25px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+  }
+}
+
+.input-item {
+  --background: #f4f7f6;
+  --border-radius: 15px;
+  --padding-start: 15px;
+  margin-bottom: 15px;
+  font-size: 1rem;
+  border: 1px solid #eee;
+
+  ion-icon {
+    font-size: 1.3rem;
+    margin-right: 10px;
+  }
+}
+
+.action-btn {
+  height: 55px;
+  --border-radius: 30px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  --box-shadow: 0 6px 20px rgba(var(--ion-color-primary-rgb), 0.4);
+}
+
+.signup-link a {
+  text-decoration: none;
+  transition: 0.3s;
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.google-btn {
+  --background: #ffffff;
+  --color: #333;
+  --border-color: #ddd;
+  --border-width: 1px;
+  --border-style: solid;
+  margin-top: 10px;
+  
+  ion-icon {
+    color: #DB4437; 
+  }
+
+  &:hover {
+    --background: #f8f8f8;
+  }
+}
+
+.divider {
+  font-size: 0.8rem;
+  color: #999;
+  margin: 15px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}

@@ -1,0 +1,69 @@
+<ion-header class="ion-no-border classic-gojek-header">
+  <ion-toolbar color="primary">
+    <ion-button slot="start" fill="clear" color="light" class="cancel-txt" (click)="kembali()">
+      Back
+    </ion-button>
+    <ion-title class="ion-text-center header-title">DRIVER REVIEW</ion-title>
+    <ion-button slot="end" fill="clear" style="visibility: hidden;">Cancel</ion-button>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content color="light" class="ion-padding classic-content">
+  <div class="gojek-review-container">
+    
+    <div *ngIf="!isSudahDirating">
+      <h1 class="main-prompt">PLEASE REVIEW YOUR EXPERIENCE</h1>
+
+      <div class="driver-box">
+        <div class="avatar-frame">
+          <img src="https://ionicframework.com/docs/img/demos/avatar.svg" alt="Driver">
+        </div>
+        <h2 class="driver-name">{{ driverName | uppercase }}</h2>
+      </div>
+
+      <div class="gojek-stars">
+        <ion-icon 
+          *ngFor="let star of [1, 2, 3, 4, 5]" 
+          [name]="star <= currentRating ? 'star' : 'star-outline'" 
+          (click)="setRating(star)">
+        </ion-icon>
+      </div>
+
+      <p class="hint-text">Give 1 star for bad service, 5 for good</p>
+
+      <div class="gojek-comment-field">
+        <ion-icon name="mail-outline" class="mail-icon"></ion-icon>
+        <input 
+          type="text" 
+          [(ngModel)]="comment" 
+          placeholder="driver sopan, aman dan selalu senyum">
+      </div>
+
+      <div class="send-btn-wrapper">
+        <button 
+          class="gojek-circular-btn" 
+          [disabled]="currentRating === 0"
+          (click)="submitRating()">
+          SEND
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="isSudahDirating" class="ion-text-center ion-padding" style="margin-top: 40px;">
+      <div style="width: 100px; height: 100px; background: #e2fcd4; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+        <ion-icon name="checkmark-done-circle" style="font-size: 64px; color: #2dd36f;"></ion-icon>
+      </div>
+      <h2 style="font-weight: bold; color: #000;">Ulasan Sudah Tersimpan!</h2>
+      <p style="color: #666; font-size: 1rem; margin-top: 10px; padding: 0 15px;">
+        Bosku, orderan ini sudah Anda beri rating sebelumnya lewat halaman utama. Terima kasih ya!
+      </p>
+      
+      <div style="margin-top: 40px;">
+        <ion-button expand="block" color="success" style="--border-radius: 25px; font-weight: bold; height: 48px;" (click)="kembali()">
+          KEMBALI KE RIWAYAT
+        </ion-button>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

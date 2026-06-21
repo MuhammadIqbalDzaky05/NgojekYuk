@@ -1,0 +1,45 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="transparent-toolbar">
+    <ion-title>Kebijakan Privasi</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" color="light">
+  <div class="policy-card">
+    <div class="header-icon">
+      <ion-icon name="shield-checkmark-outline"></ion-icon>
+    </div>
+    <h2 class="title">Ketentuan & Kebijakan</h2>
+    <p class="subtitle">
+      Kami berkomitmen menjaga privasi Anda. Dengan menggunakan NgojekYuk, Anda menyetujui hal-hal berikut:
+    </p>
+    
+    <div class="policy-list">
+      <div class="list-item">
+        <ion-icon name="location-outline"></ion-icon>
+        <span>Akses GPS untuk penjemputan akurat.</span>
+      </div>
+      <div class="list-item">
+        <ion-icon name="person-outline"></ion-icon>
+        <span>Data pribadi digunakan hanya untuk transaksi.</span>
+      </div>
+      <div class="list-item">
+        <ion-icon name="lock-closed-outline"></ion-icon>
+        <span>Data aman dan tidak dibagikan tanpa izin.</span>
+      </div>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer class="ion-no-border">
+  <div class="footer-container">
+    <ion-item lines="none" class="checkbox-item">
+      <ion-checkbox slot="start" [(ngModel)]="isCentang" color="success"></ion-checkbox>
+      <ion-label class="ion-text-wrap">Saya telah membaca dan menyetujui kebijakan privasi.</ion-label>
+    </ion-item>
+
+    <ion-button expand="block" (click)="setujuiPrivasi()" [disabled]="!isCentang" class="action-btn">
+      Lanjutkan
+    </ion-button>
+  </div>
+</ion-footer>

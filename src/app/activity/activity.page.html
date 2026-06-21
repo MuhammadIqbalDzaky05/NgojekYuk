@@ -1,0 +1,112 @@
+<ion-header class="ion-no-border classic-gojek-header">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Aktivitas</ion-title>
+  </ion-toolbar>
+  
+  <ion-toolbar color="primary">
+    <ion-segment [value]="selectedSegment" (ionChange)="segmentChanged($event)" mode="md">
+      <ion-segment-button value="riwayat">
+        <ion-label>Riwayat</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="news" *ngIf="userRole === 'customer'">
+        <ion-label>News</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content color="light">
+  
+  <div *ngIf="selectedSegment === 'riwayat'">
+    
+    <div *ngIf="riwayatList.length === 0 && !isLoading" class="ion-padding ion-text-center" style="margin-top: 50px;">
+      <ion-icon name="receipt-outline" style="font-size: 64px; color: #ccc;"></ion-icon>
+      <p style="color: #888;">Belum ada riwayat perjalanan.</p>
+    </div>
+
+    <div *ngIf="isLoading" class="ion-text-center ion-padding" style="margin-top: 20px;">
+      <ion-spinner color="primary"></ion-spinner>
+      <p style="color: #666; font-size: 0.9rem;">Memuat riwayat perjalanan...</p>
+    </div>
+
+    <ion-card *ngFor="let item of riwayatList" class="history-card">
+      <ion-item lines="none">
+        <ion-icon 
+          [name]="item.vehicle_type === 'motor' ? 'bicycle' : 'car'" 
+          slot="start" 
+          color="primary">
+        </ion-icon>
+        <ion-label>
+          <h2 style="font-weight: bold;">{{ item.vehicle_type | uppercase }}</h2>
+          <p>{{ item.created_at | date:'dd MMM yyyy, HH:mm' }}</p>
+        </ion-label>
+        <ion-badge slot="end" [color]="item.status === 'selesai' ? 'success' : 'warning'">
+          {{ item.status | titlecase }}
+        </ion-badge>
+      </ion-item>
+      
+      <ion-card-content>
+        <div class="route-info" style="margin-bottom: 15px;">
+          <p style="margin: 5px 0; display: flex; align-items: center;">
+            <ion-icon name="radio-button-on" color="primary" style="margin-right: 10px;"></ion-icon> 
+            <span style="font-size: 0.9rem; color: #444;">{{ item.asal }}</span>
+          </p>
+          <p style="margin: 5px 0; display: flex; align-items: center;">
+            <ion-icon name="location" color="danger" style="margin-right: 10px;"></ion-icon> 
+            <span style="font-size: 0.9rem; color: #444;">{{ item.tujuan }}</span>
+          </p>
+        </div>
+
+        <div class="price-info" style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed #ddd; padding-top: 10px;">
+          
+          <div *ngIf="item.status === 'selesai' && userRole === 'customer'">
+            
+            <ion-button 
+              *ngIf="!item.sudah_dirating" 
+              fill="clear" 
+              size="small" 
+              color="warning" 
+              style="margin: 0; padding: 0; font-weight: bold;"
+              (click)="keHalamanRating(item)">
+              <ion-icon name="star-outline" slot="start"></ion-icon>
+              Beri Rating
+            </ion-button>
+
+            <span *ngIf="item.sudah_dirating" style="color: #2dd36f; font-weight: bold; font-size: 0.85rem; display: flex; align-items: center;">
+              <ion-icon name="checkmark-done-circle" style="margin-right: 4px; font-size: 1.1rem;"></ion-icon> Selesai Diulas
+            </span>
+
+          </div>
+
+          <div *ngIf="item.status !== 'selesai' || userRole !== 'customer'"></div>
+
+          <strong style="color: #2ecc71; font-size: 1.1rem;">
+            Rp {{ item.harga | number:'1.0-0' }}
+          </strong>
+
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <div *ngIf="selectedSegment === 'news'">
+    <div *ngIf="newsList.length === 0" class="ion-padding ion-text-center">
+      <p>Tidak ada berita terbaru.</p>
+    </div>
+
+    <ion-card *ngFor="let n of newsList" class="news-card">
+      <img [src]="n.image" style="width: 100%; height: 150px; object-fit: cover;"/>
+      <ion-card-header>
+        <ion-card-subtitle>{{ n.time }}</ion-card-subtitle>
+        <ion-card-title style="font-size: 1.1rem;">{{ n.title }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        {{ n.desc }}
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+</ion-content>

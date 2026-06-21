@@ -1,0 +1,88 @@
+// Definisi Warna
+$cream: #FDFBF7;
+$sage: #8A9A5B;
+$dark-sage: #6B7A45;
+
+:host {
+  background-color: $cream !important;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.transparent-toolbar {
+  --background: #{$cream};
+  --border-color: transparent;
+}
+
+.policy-card {
+  background: white;
+  padding: 30px;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+  margin-top: 10px;
+
+  .header-icon {
+    font-size: 40px;
+    color: $sage;
+    margin-bottom: 20px;
+  }
+
+  .title {
+    font-weight: 800;
+    color: #2D3436;
+    margin-bottom: 12px;
+  }
+
+  .subtitle {
+    color: #636E72;
+    line-height: 1.6;
+    margin-bottom: 25px;
+  }
+}
+
+.policy-list {
+  .list-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    font-size: 0.95rem;
+    color: #444;
+
+    ion-icon {
+      color: $sage;
+      font-size: 24px;
+      margin-right: 15px;
+      flex-shrink: 0;
+    }
+  }
+}
+
+.footer-container {
+  background: $cream;
+  // Padding atas-bawah (20px) + penyesuaian untuk nav-bar bawah
+  padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+  border-top: 1px solid #EFEFEF;
+
+  .checkbox-item {
+    --background: transparent;
+    margin-bottom: 20px;
+    
+    ion-label {
+      font-size: 0.85rem;
+      white-space: normal;
+      color: #636E72;
+    }
+  }
+
+  .action-btn {
+    --background: #{$sage};
+    --background-activated: #{$dark-sage};
+    --border-radius: 14px;
+    height: 54px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+  }
+}

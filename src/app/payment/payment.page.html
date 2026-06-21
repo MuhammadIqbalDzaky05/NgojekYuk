@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Pembayaran Pesanan</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="ion-text-center ion-margin-bottom">
+    <h3>Pembayaran Manual</h3>
+    <p>Silahkan lakukan transfer sesuai nominal pesanan Anda ke rekening di bawah ini:</p>
+  </div>
+
+  <ion-card color="light" class="ion-no-margin ion-margin-bottom">
+    <ion-card-content class="bank-info">
+      <p style="font-size: 16px; margin-bottom: 8px;"><b>Bank:</b> BCA</p>
+      <p style="font-size: 16px; margin-bottom: 8px;"><b>No Rekening:</b> 1234567890</p>
+      <p style="font-size: 16px; margin-bottom: 0;"><b>Atas Nama:</b> PT Ngojek Yuk Indonesia</p>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-item lines="none" class="ion-margin-bottom" style="border: 1px dashed #ccc; border-radius: 8px;">
+    <ion-label position="stacked" style="margin-bottom: 10px; font-weight: bold;">Upload Bukti Bayar:</ion-label>
+    <input type="file" (change)="onFileSelected($event)" [disabled]="isUploading" style="padding: 10px 0;">
+  </ion-item>
+
+  <ion-button expand="block" (click)="uploadBukti()" [disabled]="isUploading">
+    <ion-icon name="cloud-upload-outline" slot="start"></ion-icon>
+    Kirim Bukti Pembayaran
+  </ion-button>
+
+  <div *ngIf="statusMessage" class="ion-text-center ion-padding ion-margin-top" style="background: #f0f5ff; border-radius: 8px; border: 1px solid #d0e0ff;">
+    <p style="font-weight: bold; color: #3880ff; font-size: 15px; margin-bottom: 12px;">
+      {{ statusMessage }}
+    </p>
+    <ion-spinner name="crescent" color="primary" *ngIf="isUploading || statusMessage.includes('Menunggu') || statusMessage.includes('Mencari') || statusMessage.includes('mencari')"></ion-spinner>
+
+    <div *ngIf="statusMessage.includes('Menunggu') || statusMessage.includes('Mencari') || statusMessage.includes('mencari')" class="ion-margin-top">
+      <ion-button expand="block" fill="outline" color="primary" (click)="backToHome()" style="margin-top: 15px;">
+        <ion-icon name="home-outline" slot="start"></ion-icon>
+        Kembali ke Utama (Tetap Mencari)
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

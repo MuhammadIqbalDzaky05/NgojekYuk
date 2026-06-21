@@ -1,0 +1,304 @@
+<!-- ==================== MINTA IZIN GPS ==================== -->
+<div *ngIf="isFirstTime" style="background: #ffffff; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px;" class="ion-text-center">
+  
+  <div style="width: 120px; height: 120px; background: #e3f2fd; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 25px;">
+    <ion-icon name="location" style="font-size: 64px; color: #3880ff;"></ion-icon>
+  </div>
+
+  <h2 style="font-weight: bold; color: #000; margin-bottom: 10px;">Aktifkan Lokasi Anda</h2>
+  <p style="color: #666; font-size: 0.95rem; line-height: 1.5; margin-bottom: 40px; padding: 0 15px;">
+    NgojekYuk memerlukan akses GPS perangkat Anda untuk mencari driver terdekat, menentukan titik penjemputan akurat, dan mengantar Anda ke tujuan dengan aman se-Karawang.
+  </p>
+
+  <!-- Tombol Eksekusi Izin GPS -->
+  <ion-button expand="block" color="primary" style="width: 100%; --border-radius: 12px; font-weight: bold; height: 50px; box-shadow: 0 4px 12px rgba(56,128,255,0.3);" (click)="prosesIzinPertama()">
+    <ion-icon name="navigate-outline" slot="start"></ion-icon>
+    Izinkan & Masuk Aplikasi
+  </ion-button>
+</div>
+
+
+<!-- ==================== INTERFACE UTAMA  ==================== -->
+<div *ngIf="!isFirstTime" style="display: flex; flex-direction: column; height: 100%;">
+  
+  <ion-header class="ion-no-border">
+    <ion-toolbar color="primary">
+      <ion-title>{{ userRole === 'driver' ? 'Driver Panel' : 'NgojekYuk' }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content color="light">
+    
+    <!-- ==================== INTERFACE CUSTOMER ==================== -->
+    <div *ngIf="userRole === 'customer'">
+      <div class="header-wave">
+        <ion-text color="light" class="ion-padding">
+          <h2>Halo, {{ userData?.name || 'User' }}</h2>
+          <p>Ke mana hari ini?</p>
+        </ion-text>
+      </div>
+
+      <!-- Mode Cari Pesanan Baru -->
+      <div *ngIf="!pesananAktif && !tampilkanModalRating">
+        <div class="ion-padding" style="padding-bottom: 0;">
+          <ion-item lines="none" class="search-item" style="margin-bottom: 0;">
+            <ion-icon name="location" slot="start" color="danger"></ion-icon>
+            <ion-input 
+              placeholder="Masukkan lokasi tujuan..." 
+              [(ngModel)]="lokasiTujuan"
+              (ionInput)="onKetikTujuan($event)"
+              [clearInput]="true">
+            </ion-input>
+          </ion-item>
+        </div>
+
+        <!-- 🔥 DROP-DOWN REKOMENDASI LOKASI HITS KARAWANG -->
+        <div *ngIf="rekomendasiLokasi && rekomendasiLokasi.length > 0" style="margin: 0 16px 15px 16px; background: #ffffff; border-radius: 0 0 12px 12px; box-shadow: 0 6px 16px rgba(0,0,0,0.15); max-height: 220px; overflow-y: auto; position: relative; z-index: 999;">
+          <ion-item button *ngFor="let lokasi of rekomendasiLokasi" (click)="pilihRekomendasi(lokasi)" lines="short" style="--background: #ffffff; --padding-start: 12px;">
+            <ion-icon name="pin" slot="start" color="primary" style="font-size: 18px; margin-right: 10px;"></ion-icon>
+            <ion-label>
+              <h3 style="font-weight: bold; color: #222; margin: 0; font-size: 0.95rem;">{{ lokasi.nama }}</h3>
+              <p style="font-size: 0.78rem; color: #666; margin: 2px 0 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ lokasi.alamat }}</p>
+            </ion-label>
+          </ion-item>
+        </div>
+
+        <ion-grid class="ion-padding" style="padding-top: 15px;">
+          <ion-row>
+            <ion-col size="6">
+              <div class="menu-box ion-activatable ripple-parent" (click)="pilihLayanan('mobil')">
+                <ion-icon name="car" color="primary"></ion-icon>
+                <ion-label>Mobil</ion-label>
+                <ion-ripple-effect></ion-ripple-effect>
+              </div>
+            </ion-col>
+            <ion-col size="6">
+              <div class="menu-box ion-activatable ripple-parent" (click)="pilihLayanan('motor')">
+                <ion-icon name="bicycle" color="success"></ion-icon>
+                <ion-label>Motor</ion-label>
+                <ion-ripple-effect></ion-ripple-effect>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+
+      <!-- Status Perjalanan Customer -->
+      <div class="ion-padding" *ngIf="pesananAktif && !tampilkanModalRating">
+        <ion-card mode="ios">
+          <ion-card-header [color]="(pesananAktif.status === 'menunggu_pembayaran' || pesananAktif.status === 'MENUNGGU_PEMBAYARAN') ? 'warning' : 
+                                   (pesananAktif.status === 'checking_admin' || pesananAktif.status === 'CHECKING_ADMIN') ? 'medium' : 'primary'">
+            <ion-card-title>
+              <span *ngIf="pesananAktif.status === 'menunggu_pembayaran' || pesananAktif.status === 'MENUNGGU_PEMBAYARAN'">💰 Menunggu Pembayaran</span>
+              <span *ngIf="pesananAktif.status === 'checking_admin' || pesananAktif.status === 'CHECKING_ADMIN'">🔍 Memverifikasi Pembayaran</span>
+              <span *ngIf="['mencari', 'mencari_driver', 'diproses', 'menjemput', 'perjalanan', 'sampai'].includes(pesananAktif.status?.toLowerCase())">🛵 Driver Sedang Memproses...</span>
+            </ion-card-title>
+          </ion-card-header>
+
+          <ion-card-content>
+            <p><b>Tujuan:</b> {{ pesananAktif.tujuan }}</p>
+            
+            <h2 style="font-size: 1.2rem; font-weight: bold; margin-top: 10px;">
+              Tarif: Rp {{ (pesananAktif.tarif || pesananAktif.harga || 0) | number:'1.0-0' }}
+            </h2>
+
+            <ion-button *ngIf="pesananAktif.status === 'menunggu_pembayaran' || pesananAktif.status === 'MENUNGGU_PEMBAYARAN'" 
+              expand="block" color="success" class="ion-margin-top"
+              (click)="keHalamanPembayaran(pesananAktif.id)">
+              <ion-icon name="wallet" slot="start"></ion-icon>
+              Bayar Sekarang
+            </ion-button>
+
+            <div *ngIf="pesananAktif.status === 'checking_admin' || pesananAktif.status === 'CHECKING_ADMIN'" class="ion-text-center ion-padding-top">
+              <ion-spinner name="crescent" color="primary"></ion-spinner>
+              <p style="margin-top: 8px; color: #555;"><b>Bukti pembayaran sedang dicek Admin...</b></p>
+            </div>
+
+            <div *ngIf="['diproses', 'menjemput', 'perjalanan', 'sampai'].includes(pesananAktif.status?.toLowerCase())" class="ion-margin-top">
+              <p><b>Driver:</b> {{ pesananAktif.driver?.name || 'Menghubungkan...' }}</p>
+              <ion-button expand="block" fill="outline" color="primary" (click)="goToChat()" class="ion-margin-top">
+                <ion-icon name="chatbubbles" slot="start"></ion-icon> Chat Driver
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <!-- POP-UP MODAL RATING & ULASAN -->
+      <ion-modal [isOpen]="tampilkanModalRating" backdropDismiss="false">
+        <ng-template>
+          <ion-content class="ion-padding ion-text-center">
+            <div style="margin-top: 30px;">
+              <div style="width: 85px; height: 85px; background: #e2fcd4; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                <ion-icon name="checkmark-done" style="font-size: 48px; color: #2dd36f;"></ion-icon>
+              </div>
+              <h2 style="font-weight: bold; color: #000; margin-top: 5px;">Hore, Sampai Tujuan!</h2>
+              <p style="color: #666; font-size: 0.95rem; padding: 0 10px;">Perjalanan Anda telah selesai. Yuk beri bintang dan ulasan pelayanan Driver Anda!</p>
+            </div>
+
+            <!-- Pilihan Bintang -->
+            <div style="margin: 30px 0; font-size: 38px;">
+              <ion-icon 
+                *ngFor="let bintang of [1,2,3,4,5]" 
+                [name]="ratingDipilih >= bintang ? 'star' : 'star-outline'" 
+                [color]="ratingDipilih >= bintang ? 'warning' : 'medium'"
+                (click)="ratingDipilih = bintang"
+                style="cursor: pointer; margin: 0 6px;">
+              </ion-icon>
+            </div>
+
+            <!-- Input Komentar -->
+            <ion-item lines="outline" style="--border-radius: 12px; margin: 0 10px 25px 10px; --background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">
+              <ion-textarea 
+                [(ngModel)]="ulasanTeks" 
+                placeholder="Ceritakan pengalaman berkendara Anda (opsional)..." 
+                rows="3">
+              </ion-textarea>
+            </ion-item>
+
+            <!-- Tombol Aksi -->
+            <div class="ion-padding-horizontal">
+              <ion-button expand="block" color="success" style="--border-radius: 12px; font-weight: bold; height: 48px; box-shadow: 0 4px 12px rgba(45,211,111,0.3);" (click)="kirimRating()">
+                <ion-icon name="star" slot="start"></ion-icon> Kirim Ulasan & Selesai
+              </ion-button>
+              
+              <ion-button expand="block" fill="clear" color="medium" style="margin-top: 10px;" (click)="tutupModalRating()">
+                Lewati / Nanti Saja
+              </ion-button>
+            </div>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+    </div>
+    
+    <!-- ==================== INTERFACE DRIVER ==================== -->
+    <div *ngIf="userRole === 'driver'">
+      <div class="map-section">
+        <div id="mapId" style="width: 100%; height: 300px; display: block;"></div>
+        
+        <div class="map-info ion-text-center ion-padding">
+          <p>
+            <ion-icon 
+              name="navigate" 
+              [color]="['diproses', 'menjemput', 'perjalanan', 'sampai'].includes(pesananMasuk?.status) ? 'success' : 'primary'" 
+              [class.pulse-icon]="!pesananMasuk">
+            </ion-icon> 
+            {{ ['diproses', 'menjemput', 'perjalanan', 'sampai'].includes(pesananMasuk?.status) ? 'Sedang Mengantar Penumpang' : 'Driver Online - Mencari Pesanan...' }}
+          </p>
+        </div>
+      </div>
+
+      <div class="ion-padding">
+        <!-- Status Aktif / Toggle Online -->
+        <ion-item lines="none" class="status-card" *ngIf="!pesananMasuk || ['selesai', 'dibatalkan', 'tersedia'].includes(pesananMasuk?.status)">
+          <ion-label>Status Aktif</ion-label>
+          <ion-toggle slot="end" [checked]="true" color="success"></ion-toggle>
+        </ion-item>
+
+        <h3 class="ion-margin-top" *ngIf="pesananMasuk && pesananMasuk?.status !== 'selesai' && pesananMasuk?.status !== 'dibatalkan'">Informasi Pesanan</h3>
+        
+        <!-- Kartu Penawaran Pesanan Masuk -->
+        <ion-card class="order-card" *ngIf="pesananMasuk && pesananMasuk?.status === 'tersedia'">
+          <ion-item lines="none">
+            <ion-icon name="person-circle" slot="start" size="large" color="primary"></ion-icon>
+            <ion-label>
+              <p style="margin-bottom: 4px;">Pemesanan At Name:</p>
+              <h2 style="font-size: 1.2rem; color: #000;"><b>{{ pesananMasuk?.customer_name || 'Pelanggan' }}</b></h2>
+              <hr style="opacity: 0.1; margin: 10px 0;">
+              <p><b>Tujuan:</b> {{ pesananMasuk?.tujuan }}</p>
+              <p><b>Kendaraan:</b> <ion-badge color="warning">{{ pesananMasuk?.vehicle_type | uppercase }}</ion-badge></p>
+              <p><b>Jarak:</b> <b style="color: #3880ff">{{ pesananMasuk?.jarak ? pesananMasuk?.jarak + ' KM' : '? KM' }}</b></p>
+              <p>
+                <b>Estimasi:</b> 
+                <b style="color: #2dd36f">
+                  ± {{ pesananMasuk?.estimasi_waktu ? pesananMasuk?.estimasi_waktu + ' Menit' : 'Menghitung...' }}
+                </b>
+              </p>
+              <p style="margin-top: 6px;">
+                <b>Tarif Pendapatan:</b> 
+                <span style="font-size: 1.2rem; color: #e040fb; font-weight: bold;">
+                  Rp {{ (pesananMasuk?.harga || pesananMasuk?.tarif) | number:'1.0-0' }}
+                </span>
+              </p>
+            </ion-label>
+          </ion-item>
+
+          <ion-footer class="ion-no-border">
+            <ion-row>
+              <ion-col>
+                <ion-button expand="block" color="success" (click)="terimaPesanan(pesananMasuk.id)">
+                  TERIMA
+                </ion-button>
+              </ion-col>
+              <ion-col>
+                <ion-button expand="block" color="danger" fill="outline" (click)="tolakPesanan()">
+                  TOLAK
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-footer>
+        </ion-card>
+
+        <!-- Kartu Jalannya Perjalanan Aktif -->
+        <ion-card color="success" class="order-active-card" *ngIf="pesananMasuk && ['diproses', 'menjemput', 'perjalanan', 'sampai'].includes(pesananMasuk?.status)">
+          <ion-item lines="none" color="success">
+            <ion-icon [name]="pesananMasuk?.vehicle_type === 'motor' ? 'bicycle' : 'car'" slot="start"></ion-icon>
+            <ion-label>
+              <h2>Mengantar: <b>{{ pesananMasuk?.customer_name || 'Penumpang' }}</b></h2>
+              <p style="color: white; opacity: 0.9;">Tujuan: {{ pesananMasuk?.tujuan }}</p>
+              <p style="color: white; opacity: 0.9; margin-top: 2px;">
+                Estimasi: <b>± {{ pesananMasuk?.estimasi_waktu ? pesananMasuk?.estimasi_waktu + ' Menit' : 'Menghitung...' }}</b> 
+                ({{ pesananMasuk?.jarak ? pesananMasuk?.jarak + ' KM' : '? KM' }})
+              </p>
+              <p style="color: white; font-weight: bold; margin-top: 4px; font-size: 1.05rem;">
+                Total Tarif: Rp {{ (pesananMasuk?.harga || pesananMasuk?.tarif) | number:'1.0-0' }}
+              </p>
+              <p style="color: #fff; margin-top: 4px; font-size: 0.8rem; opacity: 0.8;">
+                Status Sistem: <ion-badge color="dark">{{ pesananMasuk?.status }}</ion-badge>
+              </p>
+            </ion-label>
+          </ion-item>
+
+          <ion-button expand="full" fill="clear" color="light" (click)="selesaikanPesanan()" style="border-top: 1px solid rgba(255,255,255,0.2); font-weight: bold;">
+            <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+            SELESAIKAN PESANAN
+          </ion-button>
+        </ion-card>
+
+        <!-- State Kosong / Tidak Ada Orderan -->
+        <div *ngIf="!pesananMasuk || pesananMasuk?.status === 'selesai' || pesananMasuk?.status === 'dibatalkan'" class="ion-text-center ion-padding" style="opacity: 0.5; margin-top: 20px;">
+          <ion-icon name="notifications-off-outline" style="font-size: 64px;"></ion-icon>
+          <p>Belum ada pesanan masuk.</p>
+          <ion-button fill="clear" size="small" (click)="getPesananTerbaru()">
+            <ion-icon name="refresh-outline" slot="start"></ion-icon> Refresh
+          </ion-button>
+        </div>
+      </div>
+    </div>
+  </ion-content>
+
+  <!-- ==================== TABS NAVIGATION FOOTER (PERBAIKAN STRUKTUR) ==================== -->
+  <ion-tab-bar slot="bottom" color="white" style="border-top: 1px solid #e0e0e0;">
+    <ion-tab-button tab="home" (click)="initMap()" class="active-tab">
+      <ion-icon name="home"></ion-icon>
+      <ion-label>Beranda</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button (click)="goToActivity()">
+      <ion-icon name="receipt"></ion-icon>
+      <ion-label>Aktivitas</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button (click)="goToChat()">
+      <ion-icon name="chatbubbles"></ion-icon>
+      <ion-label>Pesan</ion-label>
+      <ion-badge color="danger" *ngIf="(pesananAktif && ['diproses', 'perjalanan'].includes(pesananAktif?.status)) || (pesananMasuk && ['diproses', 'dalam_perjalanan'].includes(pesananMasuk?.status))">!</ion-badge>
+    </ion-tab-button>
+
+    <ion-tab-button (click)="goToProfile()">
+      <ion-icon name="person"></ion-icon>
+      <ion-label>Profil</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+
+</div>

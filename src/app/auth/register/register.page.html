@@ -1,0 +1,101 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar style="--background: var(--ion-color-primary); color: white;">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home" color="light"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Daftar Akun</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="auth-wrapper" style="padding-top: 20px;">
+    
+    <div class="form-section-reg ion-padding">
+      
+      <p class="ion-text-center ion-margin-bottom" style="color: #666; font-size: 0.9rem;">Pilih jenis akun kamu:</p>
+      
+      <ion-segment [(ngModel)]="userType" mode="ios" class="custom-segment ion-margin-bottom">
+        <ion-segment-button value="customer">
+          <ion-icon name="people"></ion-icon>
+          <ion-label>Customer</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="driver">
+          <ion-icon name="bicycle"></ion-icon>
+          <ion-label>Driver</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+
+      <div *ngIf="userType === 'driver'" class="ion-text-center ion-margin-bottom">
+        <div (click)="triggerFileInput()" class="photo-upload-container" 
+             style="width: 100px; height: 100px; border-radius: 50%; background: #f4f4f4; margin: 0 auto; display: flex; align-items: center; justify-content: center; border: 2px dashed var(--ion-color-primary); overflow: hidden; position: relative;">
+          
+          <img *ngIf="photoPreview" [src]="photoPreview" style="width: 100%; height: 100%; object-fit: cover;">
+          
+          <div *ngIf="!photoPreview" style="text-align: center;">
+            <ion-icon name="camera-outline" color="primary" style="font-size: 30px;"></ion-icon>
+            <p style="font-size: 10px; margin: 0; color: #666;">Foto Driver</p>
+          </div>
+          
+          <input type="file" id="fileInput" (change)="onFileSelect($event)" accept="image/*" style="display: none;">
+        </div>
+        <p style="font-size: 11px; color: var(--ion-color-danger); margin-top: 5px;">* Wajib upload foto wajah</p>
+      </div>
+
+      <ion-item lines="none" class="input-item ion-margin-bottom">
+        <ion-icon name="person-outline" slot="start" color="medium"></ion-icon>
+        <ion-input [(ngModel)]="regData.username" placeholder="Username"></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="input-item ion-margin-bottom">
+        <ion-icon name="mail-outline" slot="start" color="medium"></ion-icon>
+        <ion-input type="email" [(ngModel)]="regData.email" placeholder="Email"></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="input-item ion-margin-bottom">
+        <ion-icon name="call-outline" slot="start" color="medium"></ion-icon>
+        <ion-input type="tel" [(ngModel)]="regData.phone" placeholder="Nomor HP"></ion-input>
+      </ion-item>
+
+      <div *ngIf="userType === 'driver'" class="driver-fields ion-margin-vertical" style="border: 1px dashed #ccc; border-radius: 10px; padding: 10px;">
+        
+        <ion-item lines="none" class="input-item ion-margin-bottom">
+          <ion-icon name="options-outline" slot="start" color="medium"></ion-icon>
+          <ion-select placeholder="Pilih Jenis Kendaraan" [(ngModel)]="regData.vehicle_type" interface="action-sheet" style="width: 100%; color: #333;">
+            <ion-select-option value="motor">Driver Motor</ion-select-option>
+            <ion-select-option value="mobil">Driver Mobil</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item lines="none" class="input-item ion-margin-bottom">
+          <ion-icon [name]="regData.vehicle_type === 'mobil' ? 'car-sport-outline' : 'bicycle-outline'" slot="start" color="medium"></ion-icon>
+          <ion-input [(ngModel)]="regData.vehicle_name" placeholder="Merek Kendaraan (Contoh: Vario 150, Beat, Avanza)"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="input-item ion-margin-bottom">
+          <ion-icon name="car-outline" slot="start" color="medium"></ion-icon>
+          <ion-input [(ngModel)]="regData.no_plat" placeholder="No. Plat Kendaraan (Contoh: B 1234 ABC)"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="input-item ion-margin-bottom">
+          <ion-icon name="card-outline" slot="start" color="medium"></ion-icon>
+          <ion-input type="number" [(ngModel)]="regData.nik" placeholder="16 Digit NIK"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="input-item ion-margin-bottom">
+          <ion-icon name="id-card-outline" slot="start" color="medium"></ion-icon>
+          <ion-input type="number" [(ngModel)]="regData.no_sim" placeholder="Nomor SIM"></ion-input>
+        </ion-item>
+      </div>
+
+      <ion-item lines="none" class="input-item ion-margin-bottom">
+        <ion-icon name="lock-closed-outline" slot="start" color="medium"></ion-icon>
+        <ion-input type="password" [(ngModel)]="regData.password" placeholder="Password"></ion-input>
+      </ion-item>
+
+      <ion-button expand="block" color="secondary" class="ion-margin-top action-btn" (click)="onRegister()">
+        DAFTAR SEKARANG
+      </ion-button>
+
+    </div>
+  </div>
+</ion-content>

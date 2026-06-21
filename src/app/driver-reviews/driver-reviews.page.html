@@ -1,0 +1,59 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="success">
+    
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/profile" text=""></ion-back-button>
+    </ion-buttons>
+
+    <ion-title>Ulasan Kerja Saya</ion-title>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" color="light">
+
+  <div *ngIf="isLoading" class="ion-text-center ion-padding">
+    <ion-spinner name="crescent" color="success"></ion-spinner>
+    <p class="color-muted">Memuat ulasan pelanggan...</p>
+  </div>
+
+  <div *ngIf="!isLoading">
+    <div class="summary-card ion-text-center ion-padding">
+      <h3>Rating Rata-Rata</h3>
+      <h1>⭐ {{ averageRating | number:'1.1-1' }} / 5.0</h1>
+      <p>Total mendapat {{ reviewsList.length }} ulasan</p>
+    </div>
+
+    <h4 class="ion-margin-start font-weight-bold" style="font-weight: 600; margin-top: 20px;">
+      Daftar Komentar Customer:
+    </h4>
+
+    <ion-list lines="none" class="bg-transparent">
+      <ion-card *ngFor="let item of reviewsList" class="review-item-card" style="margin-bottom: 12px;">
+        <ion-card-content>
+          <div class="card-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span class="order-code" style="font-weight: bold; color: #666;">Order ID: #{{ item.order_id }}</span>
+            
+            <div class="stars-indicator">
+              <ion-icon name="star" color="warning" *ngFor="let star of getStars(item.rating)"></ion-icon>
+            </div>
+          </div>
+          
+          <p class="customer-comment" style="font-style: italic; color: #222; font-size: 1.05rem; margin: 8px 0;">
+            " {{ item.comment ? item.comment : 'Customer tidak memberikan komentar.' }} "
+          </p>
+          
+          <div class="time-stamp" style="font-size: 0.8rem; color: #999; text-align: right;">
+            {{ item.created_at | date:'dd MMM yyyy, HH:mm' }}
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <div *ngIf="reviewsList.length === 0" class="ion-text-center ion-padding color-muted" style="margin-top: 40px;">
+        <ion-icon name="chatbox-ellipses-outline" style="font-size: 4rem; color: #ccc;"></ion-icon>
+        <p style="color: #888; font-size: 1rem; margin-top: 10px;">Belum ada ulasan masuk dari customer.</p>
+      </div>
+    </ion-list>
+  </div>
+
+</ion-content>

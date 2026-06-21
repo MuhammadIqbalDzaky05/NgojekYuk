@@ -1,0 +1,115 @@
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 20px; // Jarak aman bawah
+}
+
+.chat-me {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+    padding-left: 20%; // Agar bubble tidak terlalu lebar ke kiri
+
+    .message-bubble {
+        background: var(--ion-color-primary);
+        color: white;
+        border-radius: 15px 15px 0px 15px;
+        padding: 10px 14px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        
+        // FIX: Proteksi teks luber
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: pre-wrap;
+
+        .sender-name { 
+            display: none; 
+        }
+        
+        .time { 
+            color: rgba(255, 255, 255, 0.8); // Putih transparan agar lebih estetik
+            font-size: 0.65em; 
+            text-align: right; 
+            margin-top: 4px;
+            display: block; // Memastikan jam turun ke bawah teks
+        }
+    }
+}
+
+.chat-them {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 12px;
+    padding-right: 20%; // Agar bubble tidak terlalu lebar ke kanan
+
+    .message-bubble {
+        background: #f0f0f0;
+        color: black;
+        border-radius: 15px 15px 15px 0px;
+        padding: 10px 14px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+
+        // FIX: Proteksi teks luber
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: pre-wrap;
+
+        .sender-name { 
+            font-weight: bold; 
+            font-size: 0.75em; 
+            color: var(--ion-color-primary); 
+            margin-bottom: 3px;
+            text-transform: capitalize;
+        }
+        
+        .time { 
+            color: #888; 
+            font-size: 0.65em; 
+            text-align: right; 
+            margin-top: 4px;
+            display: block;
+        }
+    }
+}
+
+// Perbaikan Footer agar Input bulat sempurna
+ion-footer {
+    background: white;
+    padding: 5px 0;
+
+    ion-toolbar {
+        --background: white;
+        --border-style: none;
+    }
+    
+    ion-item {
+        --background: #f2f2f2;
+        --border-radius: 25px; // Membuat input lonjong
+        --padding-start: 15px;
+        --inner-padding-end: 5px;
+        margin: 5px 10px;
+        
+        ion-input {
+            --padding-top: 10px;
+            --padding-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        ion-button {
+            --padding-start: 5px;
+            --padding-end: 5px;
+            margin: 0;
+            height: 35px;
+        }
+    }
+}
+
+// Animasi sedikit agar chat muncul halus
+.message-bubble {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}

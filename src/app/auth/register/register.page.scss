@@ -1,0 +1,55 @@
+// Mengambil gaya dasar .input-item dan .action-btn yang mirip dengan login
+
+.form-section-reg {
+  background: white;
+  border-top-left-radius: 35px;
+  border-top-right-radius: 35px;
+  flex: 1;
+  padding-bottom: 30px;
+}
+
+// Gaya Kustom Segment
+.custom-segment {
+  background: #f0f0f0;
+  border-radius: 10px;
+  padding: 5px;
+  
+  ion-segment-button {
+    --color-checked: white;
+    --background-checked: var(--ion-color-primary);
+    --border-radius: 8px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    --indicator-color: transparent !important; // Menghapus garis bawah bawaan MD
+
+    ion-icon {
+      font-size: 1.2rem;
+      margin-bottom: 2px;
+    }
+  }
+}
+
+// Re-use gaya input dari login (agar rapi, sebaiknya taruh di global, tapi ini untuk kemudahan copy-paste)
+.input-item {
+  --background: #f4f7f6;
+  --border-radius: 12px;
+  margin-bottom: 12px; // Sedikit lebih rapat agar tidak scroll terlalu jauh
+  font-size: 0.9rem;
+
+  ion-icon {
+    font-size: 1.1rem;
+  }
+}
+
+.action-btn {
+  height: 48px;
+  margin-top: 20px;
+}
+
+// Memberi sedikit gaya visual pada field khusus driver agar terasa terpisah
+.driver-fields {
+  padding: 10px;
+  background: #fff8f0; // Background orange sangat tipis
+  border-radius: 12px;
+  border: 1px dashed var(--ion-color-secondary);
+}

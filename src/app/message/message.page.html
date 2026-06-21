@@ -1,0 +1,49 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Chat Pesanan</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="chat-container ion-padding">
+    <ng-container *ngIf="messages && messages.length > 0">
+      <div *ngFor="let msg of messages" 
+           [ngClass]="{'chat-me': msg.sender == userRole, 'chat-them': msg.sender != userRole}" 
+           class="message-wrapper">
+        
+        <div class="message-bubble">
+          <div class="sender-name">{{ msg.sender | uppercase }}</div>
+          <div class="text">{{ msg.message }}</div>
+          <div class="time-container ion-text-end">
+            <small class="time">{{ msg.created_at | date:'HH:mm' }}</small>
+          </div>
+        </div>
+
+      </div>
+    </ng-container>
+
+    <div *ngIf="messages && messages.length === 0" class="empty-chat ion-text-center">
+      <ion-icon name="chatbubbles-outline"></ion-icon>
+      <p>Belum ada obrolan.<br><small>Kirim pesan untuk memulai koordinasi.</small></p>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer class="ion-no-border">
+  <ion-toolbar color="light">
+    <ion-item lines="none" color="light" class="input-item">
+      <ion-input 
+        [(ngModel)]="newMessage" 
+        placeholder="Tulis pesan..." 
+        (keyup.enter)="sendMessage()"
+        class="ion-padding-start">
+      </ion-input>
+      <ion-button slot="end" fill="clear" (click)="sendMessage()" [disabled]="!newMessage || !newMessage.trim()">
+        <ion-icon slot="icon-only" name="send" color="primary"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-toolbar>
+</ion-footer>

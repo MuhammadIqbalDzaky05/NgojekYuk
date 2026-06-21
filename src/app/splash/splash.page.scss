@@ -1,0 +1,22 @@
+.splash-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; // Mengikuti tinggi penuh layar
+  width: 100vw;  // Mengikuti lebar penuh layar
+  background-color: #fefad4;
+  overflow: hidden;
+}
+
+.splash-img {
+  width: 70%;        // Gambar akan selebar 70% dari layar
+  max-width: 400px;  // Maksimal lebar agar tidak terlalu besar di tablet
+  height: auto;      // Menjaga aspek rasio gambar agar tidak gepeng
+  object-fit: contain;
+  animation: fadeIn 1.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

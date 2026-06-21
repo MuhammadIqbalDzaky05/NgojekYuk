@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">NgojekYuk</string>
+    <string name="title_activity_main">NgojekYuk</string>
+    <string name="package_name">com.ngojekyuk.app</string>
+    <string name="custom_url_scheme">com.ngojekyuk.appy</string>
+    <string name="server_client_id">546807043611-bo5omk0o5432h00siqidv0fc4qd1g5qf.apps.googleusercontent.com</string>
+</resources>
