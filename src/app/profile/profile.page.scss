@@ -14,12 +14,23 @@
     height: 100% !important;
     margin: 0;
 
-    // Memastikan gambar landscape terpotong rapi di tengah dan memenuhi lingkaran
+    // Pastikan container avatar tidak punya overflow/size aneh
+    overflow: hidden;
+
+    // Memastikan gambar ter-crop dan mengisi lingkaran
     img {
       width: 100% !important;
       height: 100% !important;
       object-fit: cover !important;
       object-position: center !important;
+      display: block;
     }
   }
 }
+
+/* Guard: beberapa platform ionic membuat <img> tidak langsung ter-style */
+ion-avatar img {
+  max-width: 100%;
+  max-height: 100%;
+}
+

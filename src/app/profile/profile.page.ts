@@ -53,32 +53,61 @@ export class ProfilePage implements OnInit {
 
     const photo = this.userData?.photo;
 
+    // DEBUG: bantu lihat format photo dari backend + hasil URL final
+    // (muncul di Console/Chrome remote debug)
+    console.log('[Profile] userData.photo =', photo);
+
     if (!photo) {
       this.photoPreview = fallback;
+      console.log('[Profile] photoPreview(fallback) =', this.photoPreview);
+      return;
+    }
+
+    // Pastikan string
+    if (typeof photo !== 'string') {
+      this.photoPreview = fallback;
+      console.log('[Profile] photoPreview(invalid type -> fallback) =', this.photoPreview);
       return;
     }
 
     // 1) Jika photo sudah berupa URL absolut, pakai langsung
-    if (typeof photo === 'string' && /^https?:\/\//i.test(photo)) {
+    if (/^https?:\/\//i.test(photo)) {
       this.photoPreview = photo;
+      console.log('[Profile] photoPreview(absolute url) =', this.photoPreview);
       return;
     }
 
-    // 2) Jika photo sudah mengandung '/storage/', jangan dobel 'storage/'
-    if (typeof photo === 'string' && photo.includes('/storage/')) {
-      this.photoPreview = this.apiUrl + photo.startsWith('/') ? photo : '/' + photo;
+    // Normalisasi: hapus spasi
+    const p = photo.trim();
+
+    // 2) Jika photo sudah berupa path absolute server (umum: "/storage/..." )
+    if (p.startsWith('/storage/')) {
+      this.photoPreview = this.apiUrl + p;
+      console.log('[Profile] photoPreview(/storage path) =', this.photoPreview);
       return;
     }
 
-    // 3) Jika photo sudah berupa path relatif di folder storage (umum: "users/xxx.jpg" atau "storage/users/xxx.jpg")
-    if (typeof photo === 'string') {
-      // Hilangkan awalan 'storage/' kalau sudah ada
-      const cleaned = photo.replace(/^storage\//, '');
-      this.photoPreview = `${this.apiUrl}/storage/${cleaned}`;
+    // 3) Jika photo mengandung '/storage/' tapi diawali tanpa slash (umum: "storage/...")
+    if (p.startsWith('storage/')) {
+      this.photoPreview = `${this.apiUrl}/${p}`;
+      console.log('[Profile] photoPreview(storage/... path) =', this.photoPreview);
       return;
     }
 
-    this.photoPreview = fallback;
+    // 4) Jika photo sudah berupa path yang tidak spesifik storage (umum: "users/xxx.jpg")
+    //    anggap itu masih ada di public/storage/<cleaned>
+    if (!p.includes('/')) {
+      // kasus sangat jarang, tapi tetap aman
+      this.photoPreview = `${this.apiUrl}/storage/${p}`;
+      console.log('[Profile] photoPreview(plain filename) =', this.photoPreview);
+      return;
+    }
+
+    // Jika photo berupa "users/xxx.jpg" (atau "uploads/...") dan belum mengandung /storage,
+    // kita coba bangun: `${apiUrl}/storage/<cleaned>` dengan menghapus awalan storage/
+    const cleaned = p.replace(/^storage\//, '');
+    this.photoPreview = `${this.apiUrl}/storage/${cleaned}`;
+    console.log('[Profile] photoPreview(assume relative storage) =', this.photoPreview);
   }
 
   onPhotoImgError() {
