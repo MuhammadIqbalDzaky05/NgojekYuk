@@ -33,7 +33,12 @@ export class HomePage implements OnInit, OnDestroy {
     pickupLat: number | null = null;
     pickupLng: number | null = null;
 
+    // ==================== CUSTOMER PICKUP (TAP TO PICKUP) ====================
+    isPickPickupMode: boolean = false; // aktif saat customer mau pilih titik jemput bebas
+    private pickupMarker: L.Marker | null = null;
+
     namaLokasiJemput: string = 'Mencari lokasi penjemputan...';
+
 
     // 🔥 KUNCIAN BARU: VARIABEL KONTROL WELCOME SCREEN
     isFirstTime: boolean = true;
@@ -388,7 +393,54 @@ export class HomePage implements OnInit, OnDestroy {
       }
     }
 
+   private setupCustomerTapPickup() {
+  if (!this.map) return;
+
+  // Hentikan event handler sebelumnya agar tidak dobel.
+  this.map.off('click');
+
+  this.map.on('click', async (e: any) => {
+    // Saat customer mode aktif, klik peta = ganti titik jemput.
+    if (this.userRole !== 'customer' || !this.isPickPickupMode) return;
+
+    const lat = e?.latlng?.lat;
+    const lng = e?.latlng?.lng;
+    if (typeof lat !== 'number' || typeof lng !== 'number') return;
+
+    this.pickupLat = lat;
+    this.pickupLng = lng;
+    this.namaLokasiJemput = 'Memilih titik penjemputan...';
+
+    // Update nama lokasi dari koordinat yang dipilih
+    await this.reverseGeocodeJemput(lat, lng);
+
+    // Update tampilan marker pickup dan rute
+    try {
+      if (this.pickupMarker) {
+        this.pickupMarker.setLatLng([lat, lng]);
+      } else {
+        // Default icon pickup pakai iconAwal (re-use), marker rute dibuat di initMap
+        const iconAwal = L.icon({
+          iconUrl: 'https://cdn-icons-png.flaticon.com/512/854/854878.png',
+          iconSize: [35, 35],
+          iconAnchor: [17, 35]
+        });
+        this.pickupMarker = L.marker([lat, lng], { icon: iconAwal }).addTo(this.map).bindPopup('Titik Penjemputan');
+        this.mapMarkers.push(this.pickupMarker);
+      }
+
+      this.map.setView([lat, lng], 15);
+    } catch {}
+
+    // Refresh jalur/estimasi dengan pickup terbaru (tanpa nunggu rerender penuh)
+    this.jarakAkuratTerhitung = null;
+    this.waktuAkuratTerhitung = null;
+    this.initMap();
+  });
+}
+
    initMap() {
+
   // 🔥 1. DETERMINASI TARGET ID SECARA DINAMIS
   let targetElementId = 'mapId'; // Default untuk driver
 
@@ -596,7 +648,20 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   setTimeout(() => { if(this.map) this.map.invalidateSize(); }, 400);
+
+  // Pasang event tap-to-pickup untuk customer
+  if (this.userRole === 'customer') {
+    this.setupCustomerTapPickup();
+
+    // Jika belum ada pickup dipilih, sync pickup dengan current GPS
+    if (!this.pickupLat || !this.pickupLng) {
+      this.pickupLat = this.currentLat;
+      this.pickupLng = this.currentLng;
+      this.reverseGeocodeJemput(this.pickupLat, this.pickupLng);
+    }
+  }
 }
+
 
 // ==================== FORMULA KALKULASI FISIK (PATEN) ====================
 
@@ -703,8 +768,11 @@ hitungEstimasiWaktu(jarakKm: number, tipeKendaraan: string): number {
         loading.dismiss();
 
         // Simpan titik jemput customer
-        this.pickupLat = this.currentLat;
-        this.pickupLng = this.currentLng;
+        // Jika customer sudah memilih via tap-to-pickup, pakai pilihan itu.
+        // Kalau belum, fallback ke GPS.
+        this.pickupLat = this.pickupLat ?? this.currentLat;
+        this.pickupLng = this.pickupLng ?? this.currentLng;
+
 
         const jarakAsliKm = this.jarakAkuratTerhitung !== null ? this.jarakAkuratTerhitung : this.hitungJarakKm(
           this.pickupLat!,

@@ -31,6 +31,19 @@
     
     <!-- ==================== INTERFACE CUSTOMER ==================== -->
     <div *ngIf="userRole === 'customer'">
+
+      <div class="map-section">
+        <div id="mapCustomer" style="width: 100%; height: 300px; display: block;"></div>
+      </div>
+
+      <div class="map-info ion-text-center ion-padding">
+        <p>
+          <ion-icon name="pin" color="primary"></ion-icon>
+          <span *ngIf="!isPickPickupMode">Pilih tujuan & cek rute di peta</span>
+          <span *ngIf="isPickPickupMode">Mode: Tap peta untuk pilih titik jemput</span>
+        </p>
+      </div>
+
       <div class="header-wave">
         <ion-text color="light" class="ion-padding">
           <h2>Halo, {{ userData?.name || 'User' }}</h2>
@@ -51,6 +64,25 @@
             </ion-input>
           </ion-item>
         </div>
+
+        <!-- PICKUP MODE CUSTOMER -->
+        <div class="ion-padding-start ion-padding-end ion-padding-top" style="padding-top: 10px;">
+          <ion-item lines="none" style="--background: #ffffff; border-radius: 12px; border: 1px solid #e6e6e6;">
+            <ion-icon name="pin" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              <div style="font-weight: bold;">Titik Jemput</div>
+              <div style="font-size: 0.85rem; color: #666; margin-top: 2px;">{{ namaLokasiJemput }}</div>
+            </ion-label>
+            <ion-toggle slot="end" [checked]="isPickPickupMode" (ionChange)="isPickPickupMode = $event.detail.checked" color="primary"></ion-toggle>
+          </ion-item>
+          <ion-note color="medium" style="margin-top: 6px; display:block;">Pickup akan berubah saat Anda tap peta.</ion-note>
+
+
+          <ion-note *ngIf="isPickPickupMode" color="primary" style="display:block; margin-top: 6px;">
+            Tap peta untuk memilih titik penjemputan.
+          </ion-note>
+        </div>
+
 
         <!-- 🔥 DROP-DOWN REKOMENDASI LOKASI HITS KARAWANG -->
         <div *ngIf="rekomendasiLokasi && rekomendasiLokasi.length > 0" style="margin: 0 16px 15px 16px; background: #ffffff; border-radius: 0 0 12px 12px; box-shadow: 0 6px 16px rgba(0,0,0,0.15); max-height: 220px; overflow-y: auto; position: relative; z-index: 999;">
