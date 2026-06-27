@@ -48,14 +48,44 @@ export class ProfilePage implements OnInit {
 
   // Fungsi pembantu untuk memproses URL foto agar mengarah ke rute bypass Laravel
   refreshPhotoUrl() {
-  if (this.userData && this.userData.photo) {
-    // Ambil base URL Laravel (misal: https://api.vibess.my.id)
-    // Lalu gabungkan langsung ke folder storage publik hasil 'php artisan storage:link'
-    this.photoPreview = `${this.apiUrl}/storage/${this.userData.photo}`;
-  } else {
-    this.photoPreview = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + (this.userData?.username || 'user');
+    const fallback =
+      'https://api.dicebear.com/7.x/avataaars/svg?seed=' + (this.userData?.username || 'user');
+
+    const photo = this.userData?.photo;
+
+    if (!photo) {
+      this.photoPreview = fallback;
+      return;
+    }
+
+    // 1) Jika photo sudah berupa URL absolut, pakai langsung
+    if (typeof photo === 'string' && /^https?:\/\//i.test(photo)) {
+      this.photoPreview = photo;
+      return;
+    }
+
+    // 2) Jika photo sudah mengandung '/storage/', jangan dobel 'storage/'
+    if (typeof photo === 'string' && photo.includes('/storage/')) {
+      this.photoPreview = this.apiUrl + photo.startsWith('/') ? photo : '/' + photo;
+      return;
+    }
+
+    // 3) Jika photo sudah berupa path relatif di folder storage (umum: "users/xxx.jpg" atau "storage/users/xxx.jpg")
+    if (typeof photo === 'string') {
+      // Hilangkan awalan 'storage/' kalau sudah ada
+      const cleaned = photo.replace(/^storage\//, '');
+      this.photoPreview = `${this.apiUrl}/storage/${cleaned}`;
+      return;
+    }
+
+    this.photoPreview = fallback;
   }
-}
+
+  onPhotoImgError() {
+    // Saat gambar gagal load, fallback ke dicebear supaya tampilan tetap ada
+    const seed = this.userData?.username || 'user';
+    this.photoPreview = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + seed;
+  }
 
   triggerFileInput() {
     const element = document.getElementById('profileFileInput') as HTMLInputElement;
