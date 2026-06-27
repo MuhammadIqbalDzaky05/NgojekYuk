@@ -19,7 +19,7 @@
     
     <div (click)="triggerFileInput()" class="profile-container">
       <ion-avatar>
-        <img [src]="photoPreview ? photoPreview : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + (userData?.username || 'user')" />
+        <img [src]="photoPreview ? photoPreview : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + (userData?.username || 'user')" (error)="onPhotoImgError()" />
       </ion-avatar>
     </div>
     
