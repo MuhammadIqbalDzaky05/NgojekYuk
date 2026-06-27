@@ -25,10 +25,13 @@ export class HomePage implements OnInit, OnDestroy {
     pesananAktif: any = null; 
     pollingTimer: any;
 
-    currentLat: number = -6.2000;
-    currentLng: number = 106.8166;
+    currentLat: number = 0;
+    currentLng: number = 0;
     destLat: number | null = null;
     destLng: number | null = null;
+
+    pickupLat: number | null = null;
+    pickupLng: number | null = null;
 
     namaLokasiJemput: string = 'Mencari lokasi penjemputan...';
 
@@ -312,20 +315,24 @@ export class HomePage implements OnInit, OnDestroy {
 
     // Fungsi pembantu terisolasi untuk mengamankan data koordinat jika GPS bermasalah
     private handleGpsFallback(errorLog: any) {
-      if (!this.currentLat || !this.currentLng) {
-        this.currentLat = -6.2000;
-        this.currentLng = 106.8166;
-      }
+      console.warn('GPS Error:', errorLog);
 
-      this.reverseGeocodeJemput(this.currentLat, this.currentLng);
+      this.currentLat = -6.323939;
+      this.currentLng = 107.301010;
 
-      if (this.router.url === '/home' || this.router.url === '/') {
-        setTimeout(() => {
-          if (typeof this.initMap === 'function') {
-            this.initMap(); 
-          }
-        }, 200);
-      }
+      this.pickupLat = this.currentLat;
+      this.pickupLng = this.currentLng;
+
+      this.namaLokasiJemput = 'Karawang';
+
+      this.reverseGeocodeJemput(
+        this.currentLat,
+        this.currentLng
+      );
+
+      setTimeout(() => {
+        this.initMap();
+      }, 300);
     }
 
     // 🔥 ACTION BARU: DIJALANKAN KETIKA TOMBOL DI WELCOME SCREEN DIKLIK USER (TIDAK DUPLIKAT)
@@ -468,9 +475,30 @@ export class HomePage implements OnInit, OnDestroy {
     
     // FIX PATEN 2: Hitung kalkulasi matematika dasar/fisik sebagai CADANGAN INSTAN (Fallback)
     // Supaya Card di HTML langsung terisi duluan tanpa menunggu server OSRM Leaflet loading.
-    const jarakCadangan = this.hitungJarakKm(this.currentLat, this.currentLng, targetLat, targetLng);
+    const startLat =
+      this.userRole === 'driver' && this.pesananMasuk?.lat_jemput
+        ? this.pesananMasuk.lat_jemput
+        : this.currentLat;
+
+    const startLng =
+      this.userRole === 'driver' && this.pesananMasuk?.lng_jemput
+        ? this.pesananMasuk.lng_jemput
+        : this.currentLng;
+
+    const jarakCadangan = this.hitungJarakKm(
+      startLat,
+      startLng,
+      targetLat,
+      targetLng
+    );
+    console.log('START LAT:', startLat);
+    console.log('START LNG:', startLng);
+    console.log('TARGET LAT:', targetLat);
+    console.log('TARGET LNG:', targetLng);
+
     const waktuCadangan = this.hitungEstimasiWaktu(jarakCadangan, this.pesananMasuk?.vehicle_type || this.pesananAktif?.vehicle_type || 'motor');
 
+    
     if (this.userRole === 'driver' && this.pesananMasuk) {
       this.pesananMasuk.jarak = jarakCadangan;
       this.pesananMasuk.estimasi_waktu = waktuCadangan;
@@ -484,9 +512,10 @@ export class HomePage implements OnInit, OnDestroy {
           serviceUrl: 'https://router.project-osrm.org/route/v1',
           suppressDemoServerWarning: true,
           waypoints: [
-            L.latLng(this.currentLat, this.currentLng),
+            L.latLng(startLat, startLng),
             L.latLng(targetLat, targetLng)
           ],
+          
           routeWhileDragging: false,
           show: false,
           addWaypoints: false,
@@ -607,7 +636,7 @@ hitungEstimasiWaktu(jarakKm: number, tipeKendaraan: string): number {
         return false; 
       }
     }
-
+    
     async pilihLayanan(tipe: string) {
       if (!this.lokasiTujuan || this.lokasiTujuan.length < 3) {
         const alert = await this.alertController.create({ header: 'Tujuan Kosong', message: 'Isi tujuan dulu!', buttons: ['OK'] });
@@ -626,7 +655,23 @@ hitungEstimasiWaktu(jarakKm: number, tipeKendaraan: string): number {
 
       // Jalankan pencarian koordinat asli berdasarkan teks yang sudah bersih
       const ditemukan = await this.cariKoordinatTujuan(teksPencarian);
+      if (
+      !this.currentLat ||
+      !this.currentLng ||
+      this.currentLat === 0 ||
+      this.currentLng === 0
+    ) {
+      const alert = await this.alertController.create({
+        header: 'GPS Belum Aktif',
+        message: 'Lokasi penjemputan belum ditemukan. Aktifkan GPS terlebih dahulu.',
+        buttons: ['OK']
+      });
 
+      await alert.present();
+      loading.dismiss();
+      return;
+    }
+      
       // JALUR PENYELAMAT: Jika server OpenStreetMap sibuk/gagal, suntik koordinat fallback pusat Karawang agar anti-alert dan anti-NaN
       if (!ditemukan || this.destLat === null || this.destLng === null) {
         if ((this as any).isDariRekomendasi) {
@@ -654,15 +699,29 @@ hitungEstimasiWaktu(jarakKm: number, tipeKendaraan: string): number {
         cekKalkulasi++;
 
         if (this.jarakAkuratTerhitung !== null || cekKalkulasi > 15) {
-          clearInterval(intervalMap);
-          loading.dismiss();
+        clearInterval(intervalMap);
+        loading.dismiss();
 
-          const jarakAsliKm = this.jarakAkuratTerhitung !== null ? this.jarakAkuratTerhitung : this.hitungJarakKm(
-            this.currentLat, 
-            this.currentLng, 
-            this.destLat!, 
-            this.destLng!
-          );
+        // Simpan titik jemput customer
+        this.pickupLat = this.currentLat;
+        this.pickupLng = this.currentLng;
+
+        const jarakAsliKm = this.jarakAkuratTerhitung !== null ? this.jarakAkuratTerhitung : this.hitungJarakKm(
+          this.pickupLat!,
+          this.pickupLng!,
+          this.destLat!,
+          this.destLng!
+        );
+        console.log('================================');
+        console.log('CURRENT LAT:', this.currentLat);
+        console.log('CURRENT LNG:', this.currentLng);
+
+        console.log('PICKUP LAT:', this.pickupLat);
+        console.log('PICKUP LNG:', this.pickupLng);
+
+        console.log('DEST LAT:', this.destLat);
+        console.log('DEST LNG:', this.destLng);
+        console.log('================================');
 
           const estimasiWaktuMenit = this.waktuAkuratTerhitung !== null ? this.waktuAkuratTerhitung : this.hitungEstimasiWaktu(jarakAsliKm, tipe);
 
@@ -694,14 +753,20 @@ hitungEstimasiWaktu(jarakKm: number, tipeKendaraan: string): number {
 
       // AMAN SINKRON: Menggunakan tanda `:` (bukan `=`) agar tidak memicu build failed/SyntaxError
       const payload = {
-        customer_id: customerId,
-        vehicle_type: tipe,
-        asal: this.namaLokasiJemput, 
-        tujuan: this.lokasiTujuan,
-        lat_tujuan: parseFloat(this.destLat.toFixed(6)),
-        lng_tujuan: parseFloat(this.destLng.toFixed(6)),
-        jarak: jarakReal
-      };
+      customer_id: customerId,
+      vehicle_type: tipe,
+
+      asal: this.namaLokasiJemput,
+      tujuan: this.lokasiTujuan,
+
+      lat_jemput: this.pickupLat,
+      lng_jemput: this.pickupLng,
+
+      lat_tujuan: parseFloat(this.destLat.toFixed(6)),
+      lng_tujuan: parseFloat(this.destLng.toFixed(6)),
+
+      jarak: jarakReal
+    };
 
       this.http.post(`${this.apiUrl}/buat-pesanan`, payload).subscribe({
         next: async (res: any) => { 

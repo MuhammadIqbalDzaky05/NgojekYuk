@@ -1,8 +1,9 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core'; 
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router'; 
-import { IonContent } from '@ionic/angular'; 
+import { IonContent, ToastController } from '@ionic/angular'; 
 import { environment } from '../../environments/environment';
+
 
 @Component({
   selector: 'app-message',
@@ -25,8 +26,10 @@ export class MessagePage implements OnInit, OnDestroy {
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
-    private router: Router 
+    private router: Router,
+    private toastCtrl: ToastController
   ) { }
+
 
   ngOnInit() {
     // 1. Ambil Identitas User
@@ -35,16 +38,22 @@ export class MessagePage implements OnInit, OnDestroy {
       const userData = JSON.parse(data);
       this.userRole = userData.role; 
     } else {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/login']); 
       return;
     }
+
 
     // 2. Ambil order_id dari parameter rute
     const idParam = this.route.snapshot.paramMap.get('id');
     
     if (!idParam || idParam === 'null' || idParam === 'undefined') {
       console.error("ID Pesanan tidak valid!");
-      alert("Sesi chat tidak valid atau pesanan sudah berakhir.");
+      this.toastCtrl.create({
+        message: 'Sesi chat tidak valid atau pesanan sudah berakhir.',
+        duration: 2500,
+        color: 'danger',
+        position: 'top',
+      }).then(t => t.present());
       this.router.navigate(['/home']); 
       return;
     }
@@ -103,9 +112,15 @@ export class MessagePage implements OnInit, OnDestroy {
     if (trimmedMsg === '') return;
     
     if (!this.orderId || !this.userRole) {
-      alert("Error: Sesi tidak valid.");
+      this.toastCtrl.create({
+        message: 'Error: Sesi tidak valid.',
+        duration: 2500,
+        color: 'danger',
+        position: 'top',
+      }).then(t => t.present());
       return;
     }
+
 
     const payload = {
       order_id: this.orderId,
@@ -126,7 +141,12 @@ export class MessagePage implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error("Gagal kirim:", error.error);
-          alert(error.error?.message || 'Gagal mengirim pesan!');
+          this.toastCtrl.create({
+            message: error.error?.message || 'Gagal mengirim pesan!',
+            duration: 2500,
+            color: 'danger',
+            position: 'top',
+          }).then(t => t.present());
           // Jika gagal, kembalikan teksnya biar user tidak capek ngetik ulang
           this.newMessage = trimmedMsg; 
         }

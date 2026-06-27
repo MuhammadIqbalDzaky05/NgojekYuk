@@ -51,7 +51,7 @@ export class ProfilePage implements OnInit {
   if (this.userData && this.userData.photo) {
     // Ambil base URL Laravel (misal: https://api.vibess.my.id)
     // Lalu gabungkan langsung ke folder storage publik hasil 'php artisan storage:link'
-    this.photoPreview = `https://api.vibess.my.id/storage/${this.userData.photo}`;
+    this.photoPreview = `${this.apiUrl}/storage/${this.userData.photo}`;
   } else {
     this.photoPreview = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + (this.userData?.username || 'user');
   }

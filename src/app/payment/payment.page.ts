@@ -40,8 +40,9 @@ export class PaymentPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidLea
 
   // UBAH DI SINI: Jangan matikan polling saat pindah halaman ke home
   ionViewDidLeave() {
-    console.log("Halaman ditinggalkan, polling tetap berjalan di latar belakang.");
-    // code 'this.stopPolling();' dihapus agar pencarian tetap aktif di background
+    // Matikan polling saat user pindah halaman agar tidak bikin interval ganda.
+    // Jika Anda ingin polling tetap hidup di background, pindahkan polling ke service.
+    this.stopPolling();
   }
 
   // Angular Lifecycle: Backup jika ionViewDidLeave tidak terpicu
@@ -57,12 +58,12 @@ export class PaymentPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidLea
   }
 
   onFileSelected(event: any) {
-    styleUrls: ['./payment.page.scss']
     this.selectedFile = event.target.files[0];
   }
 
   uploadBukti() {
     if (!this.selectedFile || !this.orderId) {
+      // eslint-disable-next-line no-alert
       alert("Pilih gambar dan pastikan ID Pesanan valid!");
       return;
     }
@@ -93,7 +94,7 @@ export class PaymentPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidLea
     if (this.statusInterval) return;
 
     this.statusInterval = setInterval(() => {
-      this.http.get(`${this.apiUrl}/pesanan/${this.orderId}`).subscribe({
+    this.http.get(`${this.apiUrl}/pesanan/${this.orderId}`).subscribe({
         next: (res: any) => {
           if (res?.status === 'success' && res.data) {
             const currentStatus = res.data.status;
@@ -101,13 +102,12 @@ export class PaymentPage implements OnInit, OnDestroy, ViewWillEnter, ViewDidLea
 
             if (currentStatus === 'menunggu_driver') {
               this.statusMessage = 'Pembayaran disetujui Admin! Mencari driver...';
-            } 
-            else if (currentStatus === 'perjalanan' || currentStatus === 'diproses') {
+            } else if (currentStatus === 'perjalanan' || currentStatus === 'diproses') {
               this.stopPolling();
+              // eslint-disable-next-line no-alert
               alert('Driver ditemukan! Perjalanan dimulai.');
               this.navCtrl.navigateForward(['/home']);
-            } 
-            else if (currentStatus === 'gagal_pembayaran') {
+            } else if (currentStatus === 'gagal_pembayaran') {
               this.stopPolling();
               alert('Maaf, bukti pembayaran Anda ditolak.');
               this.navCtrl.navigateRoot('/home');
